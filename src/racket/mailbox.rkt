@@ -54,12 +54,12 @@
                     #:smtp-user     smtp-user
                     #:smtp-password smtp-password
                     #:sender        sender) 
-  (let ([smtp-config (smtp-config smtp-host 
-                                  smtp-port 
-                                  smtp-user 
-                                  smtp-password
-                                  sender)]
-        [message-thread (start-message-thread smtp-config)])
+  (let* ([smtp-config (smtp-config smtp-host 
+                                   smtp-port 
+                                   smtp-user 
+                                   smtp-password
+                                   sender)]
+         [message-thread (start-message-thread smtp-config)])
     (mailbox smtp-config message-thread)))
 
 (struct mail-task (recipient 
