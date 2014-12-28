@@ -1,14 +1,37 @@
 #lang racket
 
+(provide mbx-create
+         mbx-send
+         mbx-shutdown)
+
 (require net/smtp
          net/head
          openssl)
 
 (struct smtp-config (host port user password sender) #:transparent)
 
+(define (mail-header sender recipients subject)
+  (standard-message-header sender recipients '() '() subject))
+
 (define (send-mail mail-task smtp-config)
-  (displayln (format "Received mail task: ~a" mail-task))
-  (error "Fuck you!"))
+  (let ([sender        (smtp-config-sender smtp-config)]
+        [recipients    (list (mail-task-recipient mail-task))]
+        [subject       (mail-task-subject mail-task)]
+        [message       (mail-task-message mail-task)]
+        [smtp-host     (smtp-config-host smtp-config)]
+        [smtp-port     (smtp-config-port smtp-config)]
+        [smtp-user     (smtp-config-user smtp-config)]
+        [smtp-password (smtp-config-password smtp-config)])
+    (smtp-send-message smtp-host
+                       sender
+                       recipients
+                       (mail-header sender recipients subject)
+                       message
+                       #:auth-user   smtp-user	 	 	 	 
+                       #:auth-passwd smtp-password
+                       #:port-no     smtp-port
+                       #:tcp-connect tcp-connect
+                       #:tls-encode  ports->ssl-ports)))
 
 (define (process-mail-task mail-task smtp-config)
   (let ([when-done   (mail-task-when-done mail-task)]
