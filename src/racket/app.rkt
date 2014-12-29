@@ -9,7 +9,7 @@
  
 (define (run)
   (serve/servlet #:servlet-path    "/ferem-downloads"
-                 #:servlet-regexp  #rx""
+                 #:servlet-regexp  #rx"^/ferem-downloads.*$"
                  #:port            17500
                  #:launch-browser? #f
                  (dispatcher (app "FEREM Downloads"))))
