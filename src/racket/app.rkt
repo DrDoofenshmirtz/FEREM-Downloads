@@ -2,15 +2,14 @@
 
 (provide run)
 
-(require web-server/servlet
-         web-server/servlet-env)
- 
-(define (app req)
-  (response/xexpr `(html (head (title "FEREM Downloads"))
-                         (body (p "Enter your user name and e-mail address to request a dowload link.")))))
+(require web-server/servlet-env
+         "actions.rkt")
+
+(struct app (name) #:transparent)
  
 (define (run)
   (serve/servlet #:servlet-path    "/ferem-downloads"
+                 #:servlet-regexp  #rx""
                  #:port            17500
                  #:launch-browser? #f
-                 app))
+                 (dispatcher (app "FEREM Downloads"))))
