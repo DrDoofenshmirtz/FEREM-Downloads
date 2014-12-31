@@ -6,9 +6,8 @@
 
 (require net/smtp
          net/head
-         openssl)
-
-(struct smtp-config (host port user password sender) #:transparent)
+         openssl
+         racket/async-channel)
 
 (define (mail-header sender recipients subject)
   (standard-message-header sender recipients '() '() subject))
@@ -33,6 +32,11 @@
                        #:tcp-connect tcp-connect
                        #:tls-encode  ports->ssl-ports)))
 
+(define (next-mail-task stop-channel)
+  (when (not (or (stop-signal? (sync stop-channel (thread-receive-evt)))
+                 (stop-signal? (async-channel-try-get stop-channel))))
+    (thread-try-receive)))
+
 (define (process-mail-task mail-task smtp-config)
   (let ([when-done   (mail-task-when-done mail-task)]
         [when-failed (mail-task-when-failed mail-task)])
@@ -40,14 +44,17 @@
       (send-mail mail-task smtp-config)
       (when-done))))
 
-(define (start-message-thread smtp-config)
+(define (start-message-thread smtp-config stop-channel)
   (letrec ([loop (lambda ()
-                   (let ([mail-task (thread-receive)])
-                     (process-mail-task mail-task smtp-config)
-                     (loop)))])
+                   (let ([mail-task (next-mail-task stop-channel)])
+                     (when (mail-task? mail-task)
+                       (process-mail-task mail-task smtp-config)
+                       (loop))))])
     (thread loop)))
 
-(struct mailbox (smtp-config message-thread) #:transparent)
+(struct smtp-config (host port user password sender) #:transparent)
+
+(struct mailbox (smtp-config message-thread stop-channel) #:transparent)
 
 (define (mbx-create #:smtp-host     smtp-host                    
                     #:smtp-port     smtp-port
@@ -59,20 +66,21 @@
                                    smtp-user 
                                    smtp-password
                                    sender)]
-         [message-thread (start-message-thread smtp-config)])
-    (mailbox smtp-config message-thread)))
-
-(struct mail-task (recipient 
-                   subject 
-                   message 
-                   when-done 
-                   when-failed) #:transparent)
+         [stop-channel   (make-async-channel 1)]
+         [message-thread (start-message-thread smtp-config stop-channel)])
+    (mailbox smtp-config message-thread stop-channel)))
 
 (define (default-when-done)
   (displayln "Successfully processed mail task."))
 
 (define (default-when-failed error)
   (displayln (format "Failed to process mail task. Error: ~a." error)))
+
+(struct mail-task (recipient 
+                   subject 
+                   message 
+                   when-done 
+                   when-failed) #:transparent)
 
 (define (mbx-send mbx recipient subject message
                   #:when-done   [when-done default-when-done]
@@ -85,5 +93,12 @@
         [message-thread (mailbox-message-thread mbx)])
     (if (thread-send message-thread mail-task #f) #t #f)))
 
+(struct stop-signal ())
+
+(define shut-down-timeout-secs 5)
+
 (define (mbx-shutdown mbx)
-  (kill-thread (mailbox-message-thread mbx)))
+  (let ([stop-channel   (mailbox-stop-channel mbx)]
+        [message-thread (mailbox-message-thread mbx)])
+    (async-channel-put stop-channel (stop-signal))
+    (sync/timeout shut-down-timeout-secs (thread-dead-evt message-thread))))
