@@ -1,7 +1,8 @@
 #lang racket
 
+(provide add-download)
+
 (require db
-         racket/date
          (planet williams/uuid:1:3/uuid))
 
 (define (connect)
@@ -12,23 +13,24 @@
 (define (uuid)
   (uuid->string (make-uuid-1)))
 
-(define (timestamp)
-  (let ([now (seconds->date (current-seconds))])
-    (format "~a-~a-~a ~a:~a:~a" 
-            (date-year now)
-            (date-month now)
-            (date-day now)
-            (date-hour now)
-            (date-minute now)
-            (date-second now))))
+(struct download (id e-mail) #:transparent)
 
-(define (create-user conn name e-mail)
-  (let* ([id        (uuid)]
-         [timestamp (timestamp)]
-         [statement (format "insert into users values ('~a', '~a', '~a', '~a')" 
-                            id 
-                            name 
-                            e-mail 
-                            timestamp)])
-    (query-exec conn statement)
-    id))
+(define (add-download conn e-mail)
+  (let ([user-id     (uuid)]
+        [download-id (uuid)])
+    (query-exec conn "begin;")
+    (query-exec conn "lock table only users;")
+    (query-exec conn 
+                (string-append "insert into users (id, e_mail)"
+                               (format " select '~a'" user-id)
+                               ", $1 where not exists"
+                               " (select users.id from users" 
+                               " where users.e_mail = $1);") 
+                e-mail)
+    (query-exec conn 
+                (string-append "insert into downloads (id, user_id)"
+                               (format " select '~a'" download-id)
+                               ", users.id from users where users.e_mail = $1;")
+                e-mail)
+    (query-exec conn "commit;")
+    (download download-id e-mail)))
