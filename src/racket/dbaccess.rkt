@@ -34,3 +34,6 @@
                 e-mail)
     (query-exec conn "commit;")
     (download download-id e-mail)))
+
+(define (record-download download-id)
+  (error "Not yet implemented..."))
