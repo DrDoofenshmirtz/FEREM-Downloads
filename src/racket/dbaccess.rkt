@@ -6,9 +6,9 @@
          (planet williams/uuid:1:3/uuid))
 
 (define (connect)
-  (postgresql-connect #:user     "frank"
+  (postgresql-connect #:user     "deinc"
                       #:database "ferem"
-                      #:password "katzenfisch"))
+                      #:password "doofolistic"))
 
 (define (uuid)
   (uuid->string (make-uuid-1)))
@@ -18,21 +18,11 @@
 (define (add-download conn e-mail)
   (let ([user-id     (uuid)]
         [download-id (uuid)])
-    (query-exec conn "begin;")
-    (query-exec conn "lock table only users;")
     (query-exec conn 
-                (string-append "insert into users (id, e_mail)"
-                               (format " select '~a'" user-id)
-                               ", $1 where not exists"
-                               " (select users.id from users" 
-                               " where users.e_mail = $1);") 
-                e-mail)
-    (query-exec conn 
-                (string-append "insert into downloads (id, user_id)"
-                               (format " select '~a'" download-id)
-                               ", users.id from users where users.e_mail = $1;")
-                e-mail)
-    (query-exec conn "commit;")
+                "select add_download($1, $2, $3);" 
+                user-id 
+                e-mail 
+                download-id)
     (download download-id e-mail)))
 
 (define (record-download download-id)
