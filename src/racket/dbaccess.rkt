@@ -13,17 +13,17 @@
 (define (uuid)
   (uuid->string (make-uuid-1)))
 
-(struct download (id e-mail) #:transparent)
+(struct download (user-id e-mail download-id) #:transparent)
 
 (define (add-download conn e-mail)
-  (let ([user-id     (uuid)]
-        [download-id (uuid)])
-    (query-exec conn 
-                "select add_download($1, $2, $3);" 
-                user-id 
-                e-mail 
-                download-id)
-    (download download-id e-mail)))
+  (let* ([user-id     (uuid)]
+         [download-id (uuid)]
+         [user-id     (query-value conn 
+                                   "select add_download($1, $2, $3);" 
+                                   user-id 
+                                   e-mail 
+                                   download-id)])
+    (download user-id e-mail download-id)))
 
 (define (record-download download-id)
   (error "Not yet implemented..."))
