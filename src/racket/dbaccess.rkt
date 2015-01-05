@@ -5,10 +5,16 @@
 (require db
          (planet williams/uuid:1:3/uuid))
 
-(define (connect)
-  (postgresql-connect #:user     #f
-                      #:database "ferem"
-                      #:password #f))
+(define (connection-factory database user password)
+  (lambda () 
+    (postgresql-connect #:database database 
+                        #:user     user 
+                        #:password password)))
+
+(define (connect-to database user password)
+  (virtual-connection (connection-pool (connection-factory database 
+                                                           user 
+                                                           password))))
 
 (define (uuid)
   (uuid->string (make-uuid-1)))
