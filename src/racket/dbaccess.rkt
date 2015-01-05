@@ -6,9 +6,9 @@
          (planet williams/uuid:1:3/uuid))
 
 (define (connect)
-  (postgresql-connect #:user     "deinc"
+  (postgresql-connect #:user     #f
                       #:database "ferem"
-                      #:password "doofolistic"))
+                      #:password #f))
 
 (define (uuid)
   (uuid->string (make-uuid-1)))
