@@ -31,5 +31,10 @@
                                    download-id)])
     (download user-id e-mail download-id)))
 
-(define (record-download download-id)
-  (error "Not yet implemented..."))
+(define (record-download conn download-id)
+  (let* ([sql    (string-append "update downloads"
+                                " set downloaded_at = current_timestamp"
+                                (format " where id = '~a'" download-id)
+                                " and downloaded_at is null;")]
+         [result (query conn sql)])
+    (> (cdr (assoc 'affected-rows (simple-result-info result))) 0)))
