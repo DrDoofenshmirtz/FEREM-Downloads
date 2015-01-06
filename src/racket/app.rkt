@@ -7,7 +7,7 @@
 
 (struct app (name) #:transparent)
  
-(define (run)
+(define (run working-directory)
   (serve/servlet #:servlet-path    "/ferem-downloads"
                  #:servlet-regexp  #rx"^/ferem-downloads.*$"
                  #:port            17500
