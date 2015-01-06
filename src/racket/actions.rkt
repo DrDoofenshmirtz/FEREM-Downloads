@@ -2,16 +2,23 @@
 
 (provide dispatcher)
 
-(require  web-server/servlet 
-          web-server/dispatch)
+(require web-server/servlet 
+         web-server/dispatch
+         web-server/templates)
+
+(define (html-response html)
+  (response/full 200 
+                 #"Okay"
+                 (current-seconds) 
+                 TEXT/HTML-MIME-TYPE
+                 empty
+                 (list (string->bytes/utf-8 html))))
 
 (define (welcome app)
-  (response/xexpr `(html (head (title "FEREM Downloads"))
-                         (body (p "FEREM Downloads")))))
+  (html-response (include-template "../html/welcome.html")))
 
 (define (four-o-four . _)
-  (response/xexpr `(html (head (title "FEREM Downloads"))
-                         (body (p "Sorry, cannot handle your request...")))))
+  (html-response (include-template "../html/four-o-four.html")))
 
 (define (action app handler)
   (lambda (request . args)
