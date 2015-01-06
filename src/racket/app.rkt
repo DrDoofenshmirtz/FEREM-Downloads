@@ -7,7 +7,7 @@
          "actions.rkt")
 
 (define (compile-paths working-directory)
-  (list (build-path working-directory "html")))
+  (list (build-path working-directory)))
 
 (define (connect-to-db)
   (connect-to "ferem" "ferem" "ferem"))
