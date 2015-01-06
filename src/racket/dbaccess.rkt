@@ -1,6 +1,7 @@
 #lang racket
 
-(provide add-download)
+(provide connect-to 
+         add-download)
 
 (require db
          (planet williams/uuid:1:3/uuid))
