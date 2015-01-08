@@ -5,6 +5,10 @@
 body { 
   padding-top: 75px; 
 }
+.ferem-navbar {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
 .ferem-navbar-btn {
   margin-left: 0.5em;
   margin-right: 0.5em;
