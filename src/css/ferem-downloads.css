@@ -5,15 +5,12 @@
 body { 
   padding-top: 75px; 
 }
-.ferem-navbar {
+.frmdls-navbar {
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
-.ferem-navbar-btn {
+.frmdls-navbar-btn {
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
-.ferem-info-text {
-  margin-left: 1.5em;
-  margin-right: 1.5em;
-}
+
