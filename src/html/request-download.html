@@ -1,86 +1,43 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>FEREM Downloads</title>
-    <link rel="stylesheet" href="/css/ferem-downloads.css">
-    <link rel="stylesheet" href="/css/bootstrap.css">
-    <link rel="stylesheet" href="/css/bootstrap-theme.css">
-  </head>
-  <body>
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="frmdls-navbar">
-        <button type="button" class="btn btn-default navbar-btn active frmdls-navbar-btn">
-          Welcome
-        </button>
-        <button type="button" class="btn btn-default navbar-btn frmdls-navbar-btn">
-          Request Download
-        </button>
-        <button type="button" class="btn btn-default navbar-btn frmdls-navbar-btn">
-          Unsubscribe
-        </button>
-        <button type="button" class="btn btn-default navbar-btn frmdls-navbar-btn">
-          Installation
-        </button>
-      </div>
-    </nav>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-1">
-          <!-- left spacer column -->
-        </div>
-        <div class="col-md-10 well well-lg">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-md-12">
-                <h4>Request a Download</h4>
-                <p>
-                  If you would like to receive a link that enables you to download a 
-                  packaged distribution of FEREM, please provide your e-mail address 
-                  and click on "Request Download". Storing your e-mail will enable us 
-                  to keep you informed about the latest updates of FEREM. 
-                  If you agree to your e-mail being stored, please additionally check 
-                  the "Store my E-mail" box.                                 
-                </p>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label for="input-e-mail">E-mail</label>
-                  <input type="email" id="input-e-mail" class="form-control" placeholder="Please enter your e-mail address to receive a download link.">
-                </div>                
-              </div>          
-            </div>
-            <div class="row">          
-              <div class="col-md-12">
-                <button id="button-request-download" class="btn btn-info">Request Download</button>
-                <p class="help-block">
-                  After entering your e-mail address, please click this button to 
-                  request a download link. The link will be sent to the specified
-                  e-mail address.
-                </p>
-                <div class="checkbox">
-                  <label>                  
-                    <input type="checkbox" id="checkbox-store-e-mail"> Store my E-mail</input>
-                  </label>
-                  <p class="help-block">
-                    Check this box if you agree to your e-mail being stored. This 
-                    will enable us to keep you informed about the latest updates.  
-                  </p>
-                </div>                
-              </div>              
-            </div>
-          </div>
-        </div>
-        <div class="col-md-1">
-          <!-- right spacer column -->
-        </div>
-      </div>
-    </div>    
-    <script src="/js/jquery-2.1.3.js"></script>
-    <script src="/js/bootstrap.js"></script>
-    <script src="/js/ferem-downloads.js"></script>
-  </body>
-</html>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h4>Request a Download</h4>
+      <p>
+        If you would like to receive a link that enables you to download a 
+        packaged distribution of FEREM, please provide your e-mail address 
+        and click on "Request Download". Storing your e-mail will enable us 
+        to keep you informed about the latest updates of FEREM. 
+        If you agree to your e-mail being stored, please additionally check 
+        the "Store my E-mail" box.                                 
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">
+        <label for="input-e-mail">E-mail</label>
+        <input type="email" id="input-e-mail" class="form-control" placeholder="Please enter your e-mail address to receive a download link.">
+      </div>                
+    </div>          
+  </div>
+  <div class="row">          
+    <div class="col-md-12">
+      <button id="button-request-download" class="btn btn-info">Request Download</button>
+      <p class="help-block">
+        After entering your e-mail address, please click this button to 
+        request a download link. The link will be sent to the specified
+        e-mail address.
+      </p>
+      <div class="checkbox">
+        <label>                  
+          <input type="checkbox" id="checkbox-store-e-mail"> Store my E-mail</input>
+        </label>
+        <p class="help-block">
+          Check this box if you agree to your e-mail being stored. This 
+          will enable us to keep you informed about the latest updates.  
+        </p>
+      </div>                
+    </div>              
+  </div>
+</div>
 
