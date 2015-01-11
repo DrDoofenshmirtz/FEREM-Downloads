@@ -4,30 +4,52 @@
 
 (require web-server/servlet 
          web-server/dispatch
-         web-server/templates)
+         web-server/templates
+         web-server/http/redirect)
 
-(define (html-response html)
-  (response/full 200 
-                 #"Okay"
+(define (html-response html #:code    [code 200] 
+                            #:message [message #"OK"]
+                            #:mime    [mime TEXT/HTML-MIME-TYPE]
+                            #:headers [headers empty])
+  (response/full code 
+                 message
                  (current-seconds) 
-                 TEXT/HTML-MIME-TYPE
-                 empty
+                 mime
+                 headers
                  (list (string->bytes/utf-8 html))))
-
-(define (welcome app)
-  (html-response (include-template "../html/welcome.html")))
-
-(define (four-o-four . _)
-  (html-response (include-template "../html/four-o-four.html")))
 
 (define (action app handler)
   (lambda (request . args)
     (apply handler app args)))
 
+(define (main app)
+  (html-response (include-template "../html/main.html")))
+
+(define (redirect-to-welcome . _)
+  (redirect-to "/ferem-downloads/welcome" permanently))
+
+(define (four-o-four . _)
+  (html-response (include-template "../html/four-o-four.html") #:code 404))
+
+(define (welcome-view)
+  (html-response (include-template "../html/welcome.html")))
+
+(define (request-download-view)
+  (html-response (include-template "../html/request-download.html")))
+
+(define views-by-name (hash "welcome"          welcome-view
+                            "request-download" request-download-view))
+
+(define (navigate-to app view-name . args)
+  (let ([view (hash-ref views-by-name view-name)])
+    (apply view args)))
+
 (define (dispatcher app)
-  (dispatch-case [("ferem-downloads")
-                  (action app welcome)]
-                 [("ferem-downloads" "welcome") 
-                  (action app welcome)]
+  (dispatch-case [("ferem-downloads" "welcome") 
+                  (action app main)]
+                 [("ferem-downloads")
+                  redirect-to-welcome]
+                 [("ferem-downloads" "navigate-to" (string-arg))
+                  (action app navigate-to)]
                  [else 
                   four-o-four]))
