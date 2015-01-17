@@ -22,14 +22,8 @@
   (lambda (request . args)
     (apply handler app args)))
 
-(define (main app)
+(define (main app . _)
   (html-response (include-template "../html/main.html")))
-
-(define (redirect-to-welcome . _)
-  (redirect-to "/ferem-downloads/welcome" permanently))
-
-(define (four-o-four . _)
-  (html-response (include-template "../html/four-o-four.html") #:code 404))
 
 (define (welcome-view)
   (html-response (include-template "../html/welcome.html")))
@@ -37,19 +31,15 @@
 (define (request-download-view)
   (html-response (include-template "../html/request-download.html")))
 
-(define views-by-name (hash "welcome"          welcome-view
-                            "request-download" request-download-view))
+(define views-by-name (hash "welcome"  welcome-view
+                            "download" request-download-view))
 
 (define (navigate-to app view-name . args)
   (let ([view (hash-ref views-by-name view-name)])
     (apply view args)))
 
 (define (dispatcher app)
-  (dispatch-case [("ferem-downloads" "welcome") 
-                  (action app main)]
-                 [("ferem-downloads")
-                  redirect-to-welcome]
-                 [("ferem-downloads" "navigate-to" (string-arg))
+  (dispatch-case [("ferem-downloads" "navigate-to" (string-arg))
                   (action app navigate-to)]
                  [else 
-                  four-o-four]))
+                  main]))
