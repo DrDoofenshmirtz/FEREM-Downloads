@@ -16,9 +16,24 @@
   function navigationAction(location) {
     return navigation.navigateTo.bind(navigation, location);    
   }
-  
+
   function onModelChange(events, model) {
-    global.console.log('Bang!');
+    var location,
+        content;
+    
+    events.forEach(function(event) {
+      if (event.changes.location) {
+        location = event.changes.location.newValue;             
+      }
+      
+      if (event.changes.content) {
+        content = event.changes.content.newValue;             
+      }
+    });
+    
+    if (content) {
+      widgets.viewContainer.html(content);
+    }
   }
   
   function installListeners() {
