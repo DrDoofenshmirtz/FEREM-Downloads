@@ -18,9 +18,9 @@
                  headers
                  (list (string->bytes/utf-8 html))))
 
-(define (action app handler)
-  (lambda (request . args)
-    (apply handler app args)))
+(define (action app handler . args)
+  (lambda (request . request-args)
+    (apply handler app (append args request-args))))
 
 (define (main app . _)
   (html-response (include-template "../html/main.html")))
@@ -31,15 +31,23 @@
 (define (request-download-view)
   (html-response (include-template "../html/request-download.html")))
 
-(define views-by-name (hash "welcome"  welcome-view
-                            "download" request-download-view))
+(define (perform-download-view download-id)
+  (html-response (include-template "../html/request-download.html")))
+
+(define views-by-name (hash "welcome"          welcome-view
+                            "request-download" request-download-view
+                            "perform-download" perform-download-view))
 
 (define (navigate-to app view-name . args)
   (let ([view (hash-ref views-by-name view-name)])
     (apply view args)))
 
 (define (dispatcher app)
-  (dispatch-case [("ferem-downloads" "navigate-to" (string-arg))
+  (dispatch-case [("ferem-downloads" "navigate-to" "download" (string-arg))
+                  (action app navigate-to "perform-download")]
+                 [("ferem-downloads" "navigate-to" "download")
+                  (action app navigate-to "request-download")]
+                 [("ferem-downloads" "navigate-to" (string-arg))
                   (action app navigate-to)]
                  [else 
                   main]))
