@@ -31,23 +31,16 @@
 (define (request-download-view)
   (html-response (include-template "../html/request-download.html")))
 
-(define (perform-download-view download-id)
-  (html-response (include-template "../html/request-download.html")))
-
 (define views-by-name (hash "welcome"          welcome-view
                             "request-download" request-download-view
-                            "perform-download" perform-download-view))
+                            "perform-download" request-download-view))
 
-(define (navigate-to app view-name . args)
+(define (render-view app view-name . args)
   (let ([view (hash-ref views-by-name view-name)])
     (apply view args)))
 
 (define (dispatcher app)
-  (dispatch-case [("ferem-downloads" "navigate-to" "download" (string-arg))
-                  (action app navigate-to "perform-download")]
-                 [("ferem-downloads" "navigate-to" "download")
-                  (action app navigate-to "request-download")]
-                 [("ferem-downloads" "navigate-to" (string-arg))
-                  (action app navigate-to)]
+  (dispatch-case [("ferem-downloads" "view" (string-arg))
+                  (action app render-view)]
                  [else 
-                  main]))
+                  (action app main)]))
