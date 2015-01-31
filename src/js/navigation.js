@@ -1,27 +1,17 @@
 (function(global, $) {
-  var locations = [
+  var hashRegex = /.+\/ferem-downloads\/?#!(.+)$/,
+      locations = [
         'welcome',
-        'download',
+        'request-download',
+        'perform-download',
         'unsubscribe',
-        'installation',
-        'error'
+        'installation'
       ],
-      locationRegex = /.+\/ferem-downloads\/?#!(.+)$/,
-      failureContent = String( 
-        '<div class="container-fluid">' +
-          '<div class="row">' +
-            '<div class="col-md-12">' +
-              '<h4>Something went wrong.</h4>' +
-              '<p>' +
-                'Please excuse.' +                                   
-              '</p>' +
-            '</div>' +
-          '</div>' +
-        '</div>');
+      defaultLocation = 'welcome';
   
   function urlToLocation(url) {
-    var matches = url.match(locationRegex),
-        location = 'welcome';
+    var matches = url.match(hashRegex),
+        location = defaultLocation;
     
     if (matches && (matches.length > 1) && locations.indexOf(matches[1]) >= 0) {
       location = matches[1];  
@@ -29,10 +19,15 @@
     
     return location;
   }
-  
-  function makeNavigation(model) {
+
+  function make() {
     var attachedTo,
-        currentLocation;
+        currentLocation,
+        navigation = {
+          onLocationChanged: function(location) {
+            global.console.log('onLocationChanged: ' + location);
+          }
+        };
     
     function onHashChange(event) {
       navigateTo(urlToLocation(event.newURL));
@@ -53,27 +48,25 @@
       }
     }
     
-    function locationChanged(location, content) {
+    function changeLocation(location) {
       currentLocation = location;
       attachedTo.location.hash = '!' + location;
-      model.set({location: location, content: content});
+      navigation.onLocationChanged(location);
     }
     
     function navigateTo(location) {
       if ((location != currentLocation) && (locations.indexOf(location) >= 0)) {
-        $.ajax('/ferem-downloads/navigate-to/' + location)
-         .done(function(response) { locationChanged(location, response); })
-         .fail(function() { locationChanged('error', failureContent); });          
+        changeLocation(location);                   
       } 
     }
     
-    return {
-      attachTo: attachTo,
-      detach: detach,
-      navigateTo: navigateTo
-    };
+    navigation.attachTo = attachTo;
+    navigation.detach = detach;
+    navigation.navigateTo = navigateTo;
+    
+    return navigation;
   }
   
-  $.fm.core.ns('frmdls.navigation').make = makeNavigation;
+  $.fm.core.ns('frmdls.navigation').make = make;
 })(this, (this.jQuery || this));
 

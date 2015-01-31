@@ -1,11 +1,10 @@
 (function(global, $) {
-  var model,
-      widgets,
-      navigation;
+  var widgets,
+      navigation,
+      presenters;
  
   function acquireWidgets() {
     return {
-      viewContainer: $('#frmdls-view-container'),
       welcomeButton: $('#frmdls-welcome-button'),
       downloadButton: $('#frmdls-download-button'),
       unsubscribeButton: $('#frmdls-unsubscribe-button'),
@@ -13,42 +12,64 @@
     };
   }
   
+  function makeNavigation() {
+    var navigation = $.frmdls.navigation.make(),
+        activePresenter;
+    
+    navigation.onLocationChanged = function(location) {
+      global.console.log('Location changed to: ' + location);
+
+      if (activePresenter) {
+        global.console.log('Deactivate active presenter.');
+        activePresenter.deactivate();
+      }
+      
+      activePresenter = presenters[location];
+      
+      if (activePresenter) {
+        global.console.log('Activate presenter for view: ' + location);
+        activePresenter.activate();  
+      } else {
+        global.console.log('No presenter found for view: ' + location);
+      }
+    };
+    
+    return navigation;
+  }
+  
+  function makePresenter(viewName) {
+    var viewURL = '/ferem-downloads/view/' + viewName,
+        make = $.frmdls.presenters.base.make;
+    
+    return make('frmdls-view-container', viewURL);
+  }
+  
+  function makePresenters() {
+    return {
+      'welcome': makePresenter('welcome'),
+      'request-download': makePresenter('request-download'),
+      'perform-download': makePresenter('perform-download'),
+      'unsubscribe': makePresenter('unsubscribe'),
+      'installation': makePresenter('installation')      
+    };
+  }
+  
   function navigationAction(location) {
     return navigation.navigateTo.bind(navigation, location);    
   }
 
-  function onModelChange(events, model) {
-    var location,
-        content;
-    
-    events.forEach(function(event) {
-      if (event.changes.location) {
-        location = event.changes.location.newValue;             
-      }
-      
-      if (event.changes.content) {
-        content = event.changes.content.newValue;             
-      }
-    });
-    
-    if (content) {
-      widgets.viewContainer.html(content);
-    }
-  }
-  
   function installListeners() {
-    model.addListener(onModelChange);
     widgets.welcomeButton.click(navigationAction('welcome'));
-    widgets.downloadButton.click(navigationAction('download'));
+    widgets.downloadButton.click(navigationAction('request-download'));
     widgets.unsubscribeButton.click(navigationAction('unsubscribe'));
     widgets.installationButton.click(navigationAction('installation'));
     navigation.attachTo(global);
   }
     
   function init() {
-    model = $.fm.model.makeModel();
     widgets = acquireWidgets();
-    navigation = $.frmdls.navigation.make(model);
+    navigation = makeNavigation();
+    presenters = makePresenters();
     installListeners();  
   }
     
