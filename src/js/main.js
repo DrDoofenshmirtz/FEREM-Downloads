@@ -43,9 +43,13 @@
   
   function makePresenter(viewName) {
     var viewURL = '/ferem-downloads/view/' + viewName,
-        make = $.frmdls.presenters.base.make;
+        presenterNamespace = $.frmdls.presenters.base,
+        makePresenter = presenterNamespace.make;
     
-    return make('frmdls-view-container', viewURL);
+    presenterNamespace = ($.frmdls.presenters[viewName] || presenterNamespace)     
+    makePresenter = (presenterNamespace.make || makePresenter);
+        
+    return makePresenter('frmdls-view-container', viewURL);
   }
   
   function makePresenters() {
