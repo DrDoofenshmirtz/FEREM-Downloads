@@ -43,15 +43,16 @@
     return navigation;
   }
   
-  function makePresenter(viewName) {
-    var viewURL = '/ferem-downloads/view/' + viewName,
+  function makePresenter(viewName) {    
+    var viewContainer = $('#frmdls-view-container'),
+        viewURL = '/ferem-downloads/view/' + viewName,
         presenterNamespace = $.frmdls.presenters.base,
         makePresenter = presenterNamespace.make;
     
     presenterNamespace = ($.frmdls.presenters[viewName] || presenterNamespace)     
     makePresenter = (presenterNamespace.make || makePresenter);
         
-    return makePresenter('frmdls-view-container', viewURL);
+    return makePresenter(viewContainer, viewURL);
   }
   
   function makePresenters() {

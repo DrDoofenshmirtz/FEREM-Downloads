@@ -7,7 +7,8 @@
         'unsubscribe',
         'installation'
       ],
-      defaultLocation = makeLocation('welcome');
+      defaultHash = 'welcome',
+      defaultLocation = makeLocation(defaultHash);
   
   function makeLocation(hash, args) {
     var location = {
@@ -82,24 +83,26 @@
       return matches[1];  
     }
     
-    return undefined;  
+    return defaultHash;  
   }
   
   function make() {
     var attachedTo,
-        currentLocation,
         navigation = {
           onLocationChanged: function(location) {
             global.console.log('onLocationChanged: ' + location);
           }
-        };
+        },
+        adjusting = false;
             
     function navigateToURL(url) {
       navigateTo(extractHashAndArgsFrom(url));
     }
         
     function onHashChange(event) {
-      navigateToURL(event.newURL);
+      if (!adjusting) {
+        navigateToURL(event.newURL);
+      }
     }
     
     function attachTo(emitter) {
@@ -121,7 +124,14 @@
       var location = parseLocation(hashAndArgsString);
       
       if (hashes.indexOf(location.hash) >= 0) {
-        attachedTo.location.hash = '!' + hashAndArgsString;
+        adjusting = true;
+        
+        try {
+          attachedTo.location.hash = '!' + hashAndArgsString;
+        } finally {
+          adjusting = false;
+        }
+        
         navigation.onLocationChanged(location);                          
       } 
     }

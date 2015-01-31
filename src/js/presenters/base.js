@@ -11,21 +11,21 @@
           '</div>' +
         '</div>');
           
-  function make(viewContainerId, viewURL) {
-    var viewContainer = $('#' + viewContainerId),
-        activated = false,
+  function make(viewContainer, viewURL) {
+    var activated = false,
         loading = false,
         ready = false,
         presenter = {
-          onActivated: function(args) {
-            global.console.log('onActivated: ' + viewURL);
-            
-            if (args) {
-              global.console.log('(args = ' + JSON.stringify(args) + ')');              
-            }
+          attachTo: function(viewContainer) {
+            global.console.log('presenter.attachTo: ' + viewURL);
           },
-          onDeactivated: function() {
-            global.console.log('onDeactivated: ' + viewURL);
+          detachFrom: function(viewContainer) {
+            global.console.log('presenter.detachFrom: ' + viewURL);
+          },
+          activated: function(args) {
+            var argsString = ' (args = ' + JSON.stringify(args || {}) + ')';
+            
+            global.console.log('presenter.activated: ' + viewURL + argsString);                        
           }
         };
     
@@ -33,9 +33,10 @@
       loading = false;
       
       if (activated) {
-        viewContainer.html(response);
         ready = true;
-        presenter.onActivated(args);
+        viewContainer.html(response);
+        presenter.attachTo(viewContainer);        
+        presenter.activated(args);
       }      
     }
     
@@ -62,15 +63,18 @@
       if (!ready) {
         loadView(args);
       } else {
-        presenter.onActivated(args);
+        presenter.activated(args);
       }
     }
     
     function deactivate() {
       if (activated) {
         activated = false;
-        ready = false;
-        presenter.onDeactivated();
+        
+        if (ready) {
+          ready = false;
+          presenter.detachFrom(viewContainer);
+        }
       }
     }
     
