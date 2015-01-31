@@ -17,21 +17,25 @@
         loading = false,
         ready = false,
         presenter = {
-          onActivated: function() {
+          onActivated: function(args) {
             global.console.log('onActivated: ' + viewURL);
+            
+            if (args) {
+              global.console.log('(args = ' + JSON.stringify(args) + ')');              
+            }
           },
           onDeactivated: function() {
             global.console.log('onDeactivated: ' + viewURL);
           }
         };
     
-    function viewLoaded(response) {
+    function viewLoaded(response, args) {
       loading = false;
       
       if (activated) {
         viewContainer.html(response);
         ready = true;
-        presenter.onActivated();
+        presenter.onActivated(args);
       }      
     }
     
@@ -43,20 +47,22 @@
       }      
     }
     
-    function loadView() {
+    function loadView(args) {
       if (!loading) {
         loading = true;
         $.ajax(viewURL)
-         .done(function(response) { viewLoaded(response); })
+         .done(function(response) { viewLoaded(response, args); })
          .fail(function(response) { failedToLoadView(response); });
       }
     }
 
-    function activate() {
+    function activate(args) {
       activated = true;
       
       if (!ready) {
-        loadView();
+        loadView(args);
+      } else {
+        presenter.onActivated(args);
       }
     }
     

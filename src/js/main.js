@@ -16,8 +16,10 @@
     var navigation = $.frmdls.navigation.make(),
         activePresenter;
     
-    navigation.onLocationChanged = function(location) {
-      var presenterForLocation = presenters[location];
+    navigation.onLocationChanged = function(location) {      
+      var hash = location.hash,
+          args = location.args,
+          presenterForLocation = presenters[hash];
       
       global.console.log('Location changed to: ' + location);
 
@@ -31,10 +33,10 @@
       }
       
       if (activePresenter) {
-        global.console.log('Activate presenter for view: ' + location);
-        activePresenter.activate();  
+        global.console.log('Activate presenter for view: ' + hash);
+        activePresenter.activate(args);  
       } else {
-        global.console.log('No presenter found for view: ' + location);
+        global.console.log('No presenter found for view: ' + hash);
       }
     };
     
