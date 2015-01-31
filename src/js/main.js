@@ -17,14 +17,18 @@
         activePresenter;
     
     navigation.onLocationChanged = function(location) {
+      var presenterForLocation = presenters[location];
+      
       global.console.log('Location changed to: ' + location);
 
-      if (activePresenter) {
-        global.console.log('Deactivate active presenter.');
-        activePresenter.deactivate();
+      if (activePresenter !== presenterForLocation) {
+        if (activePresenter) {
+          global.console.log('Deactivate active presenter.');        
+          activePresenter.deactivate();
+        }
+        
+        activePresenter = presenterForLocation;  
       }
-      
-      activePresenter = presenters[location];
       
       if (activePresenter) {
         global.console.log('Activate presenter for view: ' + location);
