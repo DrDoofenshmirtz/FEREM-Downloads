@@ -55,7 +55,7 @@
     }
     
     function navigateTo(location) {
-      if ((location != currentLocation) && (locations.indexOf(location) >= 0)) {
+      if (locations.indexOf(location) >= 0) {
         changeLocation(location);                   
       } 
     }
