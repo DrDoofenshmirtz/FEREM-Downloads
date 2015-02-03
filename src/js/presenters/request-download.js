@@ -1,13 +1,14 @@
 (function(global, $) {
     
-  function make(model) {
-    var widgets;
+  function make(viewContainer, viewURL) {
+    var presenter = $.frmdls.presenters.base.make(viewContainer, viewURL),
+        widgets;
     
     function onRequestDownloadClicked(event) {
-      global.alert('*FU!*');  
+      global.alert('onRequestDownloadClicked');  
     }
     
-    function attach() {
+    presenter.attachTo = function(viewContainer) {
       if (!widgets) {
         widgets = {
           view: $('#frmdls-request-download-view'),
@@ -17,21 +18,17 @@
         };
         widgets.requestDownloadButton.click(onRequestDownloadClicked);
       }
-    }
-    
-    function detach() {
+    };
+    presenter.detachFrom = function(viewContainer) {
       if (widgets) {
         widgets.requestDownloadButton.off('click');
         widgets = undefined;
       }
-    }
-    
-    return {
-      attach: attach,
-      detach: detach
     };
+    
+    return presenter;
   }
     
-  $.fm.core.ns('frmdls.controllers.requestDownload').make = make;
+  $.fm.core.ns('frmdls.presenters.request-download').make = make;
 })(this, (this.jQuery || this));
 
