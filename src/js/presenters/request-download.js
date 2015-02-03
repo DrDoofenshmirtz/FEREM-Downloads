@@ -3,9 +3,13 @@
   function make(viewContainer, viewURL) {
     var presenter = $.frmdls.presenters.base.make(viewContainer, viewURL),
         widgets;
+        
+    function eMailChanged(event) {
+      global.console.log('eMailChanged');  
+    }
     
     function onRequestDownloadClicked(event) {
-      global.alert('onRequestDownloadClicked');  
+      global.console.log('onRequestDownloadClicked');  
     }
     
     presenter.attachTo = function(viewContainer) {
@@ -16,11 +20,13 @@
           requestDownloadButton: $('#frmdls-request-download-button'),
           storeEMailCheckbox: $('#frmdls-store-e-mail-checkbox')
         };
+        widgets.eMailInput.on('change', eMailChanged);
         widgets.requestDownloadButton.click(onRequestDownloadClicked);
       }
     };
     presenter.detachFrom = function(viewContainer) {
       if (widgets) {
+        widgets.eMailInput.off('change');
         widgets.requestDownloadButton.off('click');
         widgets = undefined;
       }
