@@ -9,7 +9,17 @@
     }
     
     function onRequestDownloadClicked(event) {
-      global.console.log('onRequestDownloadClicked');  
+      var data = {'e-mail-address': 'perry@deinc.evil'};
+      
+      global.console.log('onRequestDownloadClicked');
+      
+      $.post('/ferem-downloads/action/request-download', data)
+       .done(function(response) { 
+         global.alert(JSON.stringify(response)); 
+       })
+       .fail(function(response) { 
+         global.alert('FAILED!'); 
+       });
     }
     
     presenter.attachTo = function(viewContainer) {
