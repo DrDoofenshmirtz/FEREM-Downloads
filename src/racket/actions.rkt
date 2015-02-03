@@ -18,6 +18,17 @@
                  headers
                  (list (string->bytes/utf-8 html))))
 
+(define (json-response json #:code    [code 200] 
+                            #:message [message #"OK"]
+                            #:mime    [mime    #"application/json; charset=utf-8"]
+                            #:headers [headers empty])
+  (response/full code 
+                 message
+                 (current-seconds) 
+                 mime
+                 headers
+                 (list (string->bytes/utf-8 json))))
+
 (define (action app handler . args)
   (lambda (request . request-args)
     (apply handler app (append args request-args))))
@@ -42,5 +53,10 @@
 (define (dispatcher app)
   (dispatch-case [("ferem-downloads" "view" (string-arg))
                   (action app render-view)]
+                 [("ferem-downloads" "action" (string-arg))
+                  #:method "post"
+                  (lambda args 
+                    (displayln args)
+                    (json-response "{\"message\": \"Thank You!\"}"))]
                  [else 
                   (action app main)]))
