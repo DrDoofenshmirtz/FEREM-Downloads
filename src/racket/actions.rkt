@@ -51,14 +51,19 @@
   (let ([view (hash-ref views-by-name view-name)])
     (apply view args)))
 
+(define (request-download app args)
+  (displayln (string-append "ACTION: request-download ARGS: " args)))
+
+(define (dump-post-data request)
+  (displayln (bytes->jsexpr (request-post-data/raw request))))
+
 (define (dispatcher app)
   (dispatch-case [("ferem-downloads" "view" (string-arg))
                   (action render-view app)]
                  [("ferem-downloads" "action" (string-arg))
                   #:method "post"
                   (lambda (request . _) 
-                    (displayln (string? (hash-ref (bytes->jsexpr (request-post-data/raw request))
-                                                  'e-mail-address)))
-                    (json-response "{\"message\": \"Thank You!\"}"))]
+                    (dump-post-data request)
+                    (json-response "{\"result\": true}"))]
                  [else 
                   (action main app)]))
