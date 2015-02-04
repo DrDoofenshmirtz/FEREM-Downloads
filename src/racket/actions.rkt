@@ -32,9 +32,9 @@
 
 (define (action handler app . args)
   (lambda (request . request-args)
-    (apply handler app (append args request-args))))
+    (apply handler app request (append args request-args))))
 
-(define (main app . _)
+(define (main app request . _)
   (html-response (include-template "../html/main.html")))
 
 (define (welcome-view)
@@ -47,23 +47,25 @@
                             "request-download" request-download-view
                             "perform-download" request-download-view))
 
-(define (render-view app view-name . args)
+(define (render-view app request view-name . args)
   (let ([view (hash-ref views-by-name view-name)])
     (apply view args)))
 
-(define (request-download app args)
-  (displayln (string-append "ACTION: request-download ARGS: " args)))
+(define (request-download app request args)
+  (displayln (string-append "ACTION: request-download ARGS: " 
+                            args
+                            " DATA: "
+                            (jsexpr->string (post-data request))))
+  (json-response "{\"result\": true}"))
 
-(define (dump-post-data request)
-  (displayln (bytes->jsexpr (request-post-data/raw request))))
+(define (post-data request)
+  (bytes->jsexpr (request-post-data/raw request)))
 
 (define (dispatcher app)
   (dispatch-case [("ferem-downloads" "view" (string-arg))
                   (action render-view app)]
                  [("ferem-downloads" "action" (string-arg))
                   #:method "post"
-                  (lambda (request . _) 
-                    (dump-post-data request)
-                    (json-response "{\"result\": true}"))]
+                  (action request-download app)]
                  [else 
                   (action main app)]))
