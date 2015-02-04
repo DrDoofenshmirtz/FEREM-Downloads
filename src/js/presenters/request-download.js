@@ -13,12 +13,17 @@
       
       global.console.log('onRequestDownloadClicked');
       
-      $.post('/ferem-downloads/action/request-download', data)
+      $.ajax({
+         type: 'POST',    
+         url: '/ferem-downloads/action/request-download', 
+         data: JSON.stringify(data),
+         contentType: 'text/plain; charset=utf-8' 
+       })
        .done(function(response) { 
          global.alert(JSON.stringify(response)); 
        })
        .fail(function(response) { 
-         global.alert('FAILED!'); 
+         global.alert('>> FAILED! <<'); 
        });
     }
     
