@@ -2,7 +2,8 @@
 
 (provide dispatcher)
 
-(require web-server/servlet 
+(require json
+         web-server/servlet 
          web-server/dispatch
          web-server/templates
          web-server/http/redirect)
@@ -29,7 +30,7 @@
                  headers
                  (list (string->bytes/utf-8 json))))
 
-(define (action app handler . args)
+(define (action handler app . args)
   (lambda (request . request-args)
     (apply handler app (append args request-args))))
 
@@ -52,11 +53,12 @@
 
 (define (dispatcher app)
   (dispatch-case [("ferem-downloads" "view" (string-arg))
-                  (action app render-view)]
+                  (action render-view app)]
                  [("ferem-downloads" "action" (string-arg))
                   #:method "post"
-                  (lambda args 
-                    (displayln args)
+                  (lambda (request . _) 
+                    (displayln (string? (hash-ref (bytes->jsexpr (request-post-data/raw request))
+                                                  'e-mail-address)))
                     (json-response "{\"message\": \"Thank You!\"}"))]
                  [else 
-                  (action app main)]))
+                  (action main app)]))
