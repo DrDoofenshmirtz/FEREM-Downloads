@@ -1,23 +1,48 @@
 (function(global, $) {
+  var eMailRegex = /^.*\S+@\S+.*$/;
     
   function make(viewContainer, viewURL) {
     var presenter = $.frmdls.presenters.base.make(viewContainer, viewURL),
         widgets;
         
-    function eMailChanged(event) {
-      global.console.log('eMailChanged');  
+    function getEMailAddress() {
+      var eMailAddress = (widgets.eMailInput.val() || '').toString().trim(),
+          matches = eMailAddress.match(eMailRegex);
+          
+      if (!matches || (matches.length !== 1)) {
+        return undefined;
+      }
+      
+      return eMailAddress;
+    }
+    
+    function getStoreEMail() {
+      return !!widgets.storeEMailCheckbox.is(':checked');
+    }
+        
+    function eMailChanged() {
+      var eMailAddressIsValid = !!getEMailAddress();
+    
+      if (eMailAddressIsValid) {
+        widgets.eMailGroup.removeClass('has-error');
+        widgets.requestDownloadButton.prop('disabled', false);
+      } else {
+        widgets.eMailGroup.addClass('has-error');
+        widgets.requestDownloadButton.prop('disabled', true);
+      }
     }
     
     function onRequestDownloadClicked(event) {      
-      var eMailAddress = (widgets.eMailInput.val() || '').toString(),
-          storeEMail = !!widgets.storeEMailCheckbox.is(':checked'),
-          data = {
-            'e-mail-address': eMailAddress,
-            'store-e-mail?': storeEMail
-          };
+      var eMailAddress = getEMailAddress(),
+          storeEMail,
+          data;
       
-      global.console.log('onRequestDownloadClicked');
+      if (!eMailAddress) {
+        return;
+      }
       
+      storeEMail = getStoreEMail();
+      data = {'e-mail-address': eMailAddress, 'store-e-mail?': storeEMail};
       $.ajax({
         type: 'POST',    
         url: '/ferem-downloads/action/request-download', 
@@ -34,12 +59,14 @@
       if (!widgets) {
         widgets = {
           view: $('#frmdls-request-download-view'),
+          eMailGroup: $('#frmdls-e-mail-group'),
           eMailInput: $('#frmdls-e-mail-input'),
           requestDownloadButton: $('#frmdls-request-download-button'),
           storeEMailCheckbox: $('#frmdls-store-e-mail-checkbox')
         };
         widgets.eMailInput.on('input', eMailChanged);
         widgets.requestDownloadButton.click(onRequestDownloadClicked);
+        eMailChanged();
       }
     };
     presenter.detachFrom = function(viewContainer) {
