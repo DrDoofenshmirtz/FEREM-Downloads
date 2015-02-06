@@ -38,13 +38,13 @@
           requestDownloadButton: $('#frmdls-request-download-button'),
           storeEMailCheckbox: $('#frmdls-store-e-mail-checkbox')
         };
-        widgets.eMailInput.on('change', eMailChanged);
+        widgets.eMailInput.on('input', eMailChanged);
         widgets.requestDownloadButton.click(onRequestDownloadClicked);
       }
     };
     presenter.detachFrom = function(viewContainer) {
       if (widgets) {
-        widgets.eMailInput.off('change');
+        widgets.eMailInput.off('input');
         widgets.requestDownloadButton.off('click');
         widgets = undefined;
       }
