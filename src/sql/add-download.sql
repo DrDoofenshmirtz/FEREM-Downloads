@@ -12,13 +12,17 @@ begin
   lock table only users;
   
   -- Insert a user row with the given user id and e-mail address unless a user
-  -- with the same e-mail address already exists.
+  -- with the same e-mail address already exists (which is never true in case 
+  -- the given e-mail is null).
   insert into users (id, e_mail)
     select _user_uuid, _e_mail where not exists 
       (select users.id from users where users.e_mail = _e_mail);
- 
-  -- Acquire the user id actually related to the given e-mail address. 
-  _user_uuid := (select users.id from users where users.e_mail = _e_mail);    
+
+  if _e_mail is not null then  
+    -- When a non-null e-mail address has been given, retrieve the user id 
+    -- actually related to the given e-mail address. 
+    _user_uuid := (select users.id from users where users.e_mail = _e_mail);
+  end if;    
       
   -- Insert a download row for the user with the given e-mail, regardless if
   -- the user already existed or has just been newly created. 
