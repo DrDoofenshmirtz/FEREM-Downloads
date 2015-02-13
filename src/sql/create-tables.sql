@@ -1,6 +1,6 @@
 create table users (
   id         uuid primary key,
-  e_mail     text not null,
+  e_mail     text,
   created_at timestamp not null default current_timestamp,
   unique(e_mail)
 );
