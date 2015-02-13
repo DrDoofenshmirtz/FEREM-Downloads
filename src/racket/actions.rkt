@@ -52,11 +52,15 @@
     (apply view args)))
 
 (define (request-download app request args)
-  (displayln (string-append "ACTION: request-download ARGS: " 
-                            args
-                            " DATA: "
-                            (jsexpr->string (post-data request))))
-  (json-response "{\"result\": true}"))
+  (let* ([post-data      (post-data request)]
+         [e-mail-address (hash-ref post-data 'e-mail-address)]
+         [store-e-mail?  (hash-ref post-data 'store-e-mail?)])
+    (displayln (string-append "request-download{e-mail-address: " 
+                              e-mail-address
+                              " store-e-mail?: "
+                              (if store-e-mail? "yes" "no")
+                              "}"))
+    (json-response "{\"result\": true}")))
 
 (define (post-data request)
   (bytes->jsexpr (request-post-data/raw request)))
