@@ -1,30 +1,16 @@
 #lang racket
 
-(provide connect-to 
-         add-download)
+(provide add-download
+         record-download)
 
 (require db
-         (planet williams/uuid:1:3/uuid))
-
-(define (connection-factory database user password)
-  (lambda () 
-    (postgresql-connect #:database database 
-                        #:user     user 
-                        #:password password)))
-
-(define (connect-to database user password)
-  (virtual-connection (connection-pool (connection-factory database 
-                                                           user 
-                                                           password))))
-
-(define (uuid)
-  (uuid->string (make-uuid-1)))
+         "dbutils.rkt")
 
 (struct download (user-id e-mail download-id) #:transparent)
 
 (define (add-download conn e-mail)
-  (let* ([user-id     (uuid)]
-         [download-id (uuid)]
+  (let* ([user-id     (uuid-string)]
+         [download-id (uuid-string)]
          [user-id     (query-value conn 
                                    "select add_download($1, $2, $3);" 
                                    user-id 
