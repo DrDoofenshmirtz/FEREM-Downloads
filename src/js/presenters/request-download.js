@@ -48,8 +48,11 @@
         url: '/ferem-downloads/action/request-download', 
         data: JSON.stringify(data),
         contentType: 'text/plain; charset=utf-8' 
-      }).done(function(response) { 
-        global.alert(JSON.stringify(response)); 
+      }).done(function(response) {
+        $.frmdls.mboxes.show(
+          widgets.messageBox, 
+          {content: JSON.stringify(response)}
+        ); 
       }).fail(function(response) { 
         global.alert('>> FAILED! <<'); 
       });
@@ -62,7 +65,8 @@
           eMailGroup: $('#frmdls-e-mail-group'),
           eMailInput: $('#frmdls-e-mail-input'),
           requestDownloadButton: $('#frmdls-request-download-button'),
-          storeEMailCheckbox: $('#frmdls-store-e-mail-checkbox')
+          storeEMailCheckbox: $('#frmdls-store-e-mail-checkbox'),
+          messageBox: $('#frmdls-message-box')          
         };
         widgets.eMailInput.on('input', eMailChanged);
         widgets.requestDownloadButton.click(onRequestDownloadClicked);
