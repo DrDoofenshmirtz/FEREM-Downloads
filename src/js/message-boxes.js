@@ -4,6 +4,16 @@
         WARNING: 'WARNING',
         ERROR: 'ERROR'
       },
+      styles = [
+        'message-box-info',
+        'message-box-warning',
+        'message-box-error'
+      ],
+      stylesByMessageType = {
+        INFO: 'message-box-info',
+        WARNING: 'message-box-warning',
+        ERROR: 'message-box-error'
+      },
       defaultOptions = {
         messageType: messageType.INFO,
         title: 'Message',
@@ -20,11 +30,17 @@
     
     options = $.extend(defaultOptions, options || {});
     widgets = {
-      titleContainer: boxElement.find('.modal-title'),
+      messageBox: boxElement.find('.modal-content'),
+      titleContainer: boxElement.find('.modal-title'),      
       contentContainer: boxElement.find('.modal-body'),
       closeButton: boxElement.find('.modal-footer.btn')
     };
     
+    styles.forEach(function(style) {
+      widgets.messageBox.removeClass(style);            
+    });
+    
+    widgets.messageBox.addClass(stylesByMessageType[options.messageType]);
     widgets.titleContainer.text(options.title);
     widgets.contentContainer.text(options.content);
     widgets.closeButton.text(options.buttonLabel);
