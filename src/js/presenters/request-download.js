@@ -51,10 +51,21 @@
       }).done(function(response) {
         $.frmdls.mboxes.show(
           widgets.messageBox, 
-          {content: JSON.stringify(response)}
+          {
+            title: 'Thank you!',
+            messageType: $.frmdls.mboxes.messageType.INFO, 
+            content: JSON.stringify(response)
+          }
         ); 
       }).fail(function(response) { 
-        global.alert('>> FAILED! <<'); 
+        $.frmdls.mboxes.show(
+          widgets.messageBox, 
+          {
+            title: 'Sorry, something went wrong...',
+            messageType: $.frmdls.mboxes.messageType.ERROR, 
+            content: JSON.stringify(response)
+          }
+        ); 
       });
     }
     
