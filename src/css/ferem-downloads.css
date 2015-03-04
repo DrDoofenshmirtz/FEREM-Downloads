@@ -13,11 +13,4 @@ body {
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
-.modal-content.frmdls-error-message {
-  border: 1px solid red; 
-  background-color: #FFBABA;
-}
-.modal-body.frmdls-message-content {
-  background-color: #FFFFFF;
-}
 

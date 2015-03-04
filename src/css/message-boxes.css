@@ -1,0 +1,16 @@
+.modal-content.message-box-info {
+  border: 1px solid blue; 
+  background-color: #d9edf7;
+}
+.modal-content.message-box-warning {
+  border: 1px solid yellow; 
+  background-color: #fcf8e3;
+}
+.modal-content.message-box-error {
+  border: 1px solid red; 
+  background-color: #f2dede;
+}
+.modal-body.message-box-content {
+  background-color: #ffffff;
+}
+
