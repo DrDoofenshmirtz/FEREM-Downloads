@@ -48,13 +48,14 @@
         url: '/ferem-downloads/action/request-download', 
         data: JSON.stringify(data),
         contentType: 'text/plain; charset=utf-8' 
-      }).done(function(response) {
+      }).done(function(message) {
         $.frmdls.mboxes.show(
           widgets.messageBox, 
           {
-            title: 'Thank you!',
+            title: message.title,
             messageType: $.frmdls.mboxes.messageType.INFO, 
-            content: JSON.stringify(response)
+            content: message.content,
+            plainText: false
           }
         ); 
       }).fail(function(response) { 
@@ -63,7 +64,8 @@
           {
             title: 'Sorry, something went wrong...',
             messageType: $.frmdls.mboxes.messageType.ERROR, 
-            content: JSON.stringify(response)
+            content: JSON.stringify(response),
+            plainText: true
           }
         ); 
       });

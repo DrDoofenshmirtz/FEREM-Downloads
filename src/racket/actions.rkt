@@ -6,29 +6,7 @@
          web-server/servlet 
          web-server/dispatch
          web-server/templates
-         web-server/http/redirect)
-
-(define (html-response html #:code    [code 200] 
-                            #:message [message #"OK"]
-                            #:mime    [mime TEXT/HTML-MIME-TYPE]
-                            #:headers [headers empty])
-  (response/full code 
-                 message
-                 (current-seconds) 
-                 mime
-                 headers
-                 (list (string->bytes/utf-8 html))))
-
-(define (json-response json #:code    [code 200] 
-                            #:message [message #"OK"]
-                            #:mime    [mime    #"application/json; charset=utf-8"]
-                            #:headers [headers empty])
-  (response/full code 
-                 message
-                 (current-seconds) 
-                 mime
-                 headers
-                 (list (string->bytes/utf-8 json))))
+         "responses.rkt")
 
 (define (action handler app . args)
   (lambda (request . request-args)
@@ -43,6 +21,9 @@
 (define (request-download-view)
   (html-response (include-template "../html/request-download.html")))
 
+(define (request-download-success e-mail-address)
+  (include-template "../html/request-download-success.html"))
+
 (define views-by-name (hash "welcome"          welcome-view
                             "request-download" request-download-view
                             "perform-download" request-download-view))
@@ -55,12 +36,9 @@
   (let* ([post-data      (post-data request)]
          [e-mail-address (hash-ref post-data 'e-mail-address)]
          [store-e-mail?  (hash-ref post-data 'store-e-mail?)])
-    (displayln (string-append "request-download{e-mail-address: " 
-                              e-mail-address
-                              " store-e-mail?: "
-                              (if store-e-mail? "yes" "no")
-                              "}"))
-    (json-response "{\"result\": true}")))
+    (message-response status-success 
+                      "Thank You!" 
+                      (request-download-success e-mail-address))))
 
 (define (post-data request)
   (bytes->jsexpr (request-post-data/raw request)))
