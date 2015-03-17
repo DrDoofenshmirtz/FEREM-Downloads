@@ -18,7 +18,8 @@
         messageType: messageType.INFO,
         title: 'Message',
         content: '...?',
-        buttonLabel: 'Close'
+        buttonLabel: 'Close',
+        plainText: true
       };
       
   function show(boxElement, options) {
@@ -42,7 +43,13 @@
     
     widgets.messageBox.addClass(stylesByMessageType[options.messageType]);
     widgets.titleContainer.text(options.title);
-    widgets.contentContainer.text(options.content);
+    
+    if (options.plainText) {
+      widgets.contentContainer.text(options.content);
+    } else {
+      widgets.contentContainer.html(options.content);
+    }
+    
     widgets.closeButton.text(options.buttonLabel);
     boxElement.modal('show');
   }
