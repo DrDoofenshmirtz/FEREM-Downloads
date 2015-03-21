@@ -7,6 +7,7 @@
          log-frmdls-debug         
          attach-writer
          close-writers
+         console-writer
          (struct-out log-entry))
 
 (define-logger frmdls)
@@ -14,7 +15,7 @@
 (struct log-entry (logger level text close-writer?) #:transparent)
 
 (define (close-entry)
-  (log-entry 'frmdls 'info "Log writers have been closed." #t))
+  (log-entry 'frmdls 'info "Log writer has been closed." #t))
 
 (define (message-entry log-message)
   (let ([level  (vector-ref log-message 0)]
@@ -66,7 +67,8 @@
   (let ([active-threads (drain-writer-threads)]
         [close-entry    (close-entry)])
     (for ([writer-thread active-threads])
-      (thread-send writer-thread close-entry))))
+      (thread-send writer-thread close-entry)
+      (thread-wait writer-thread))))
 
 (define (console-writer [entry-format "[~a ~a] ~a"])
   (lambda (log-entry)
