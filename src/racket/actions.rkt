@@ -6,11 +6,17 @@
          web-server/servlet 
          web-server/dispatch
          web-server/templates
+         "logging.rkt"
          "responses.rkt")
 
 (define (action handler app . args)
   (lambda (request . request-args)
-    (apply handler app request (append args request-args))))
+    (let ([url  (url->string (request-uri request))]
+          [args (append args request-args)]
+          [data (post-data request)])
+      (log-frmdls-info "Handling request (url: ~a args: ~a data: ~a)." 
+                       url args data)
+      (apply handler app request args))))
 
 (define (main app request . _)
   (html-response (include-template "../html/main.html")))
@@ -41,7 +47,10 @@
                       (request-download-success e-mail-address))))
 
 (define (post-data request)
-  (bytes->jsexpr (request-post-data/raw request)))
+  (let ([post-data (request-post-data/raw request)])
+    (if post-data
+        (bytes->jsexpr post-data)
+        post-data)))
 
 (define (dispatcher app)
   (dispatch-case [("ferem-downloads" "view" (string-arg))
