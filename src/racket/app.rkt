@@ -4,8 +4,15 @@
 
 (require web-server/servlet-env
          "logging.rkt"
+         "config.rkt"
          "dbutils.rkt"
          "actions.rkt")
+
+(define (config-path working-directory)
+  (build-path working-directory "config" "config.json"))
+
+(define (load-config working-directory)
+  (read-config-file (config-path working-directory)))
 
 (define (compile-paths working-directory)
   (list (build-path working-directory)))
