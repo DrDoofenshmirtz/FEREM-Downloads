@@ -35,13 +35,31 @@
               next-entry
               (close-entry))))))
 
+(define flush-timeout-seconds 5)
+
+(define (flush-timeout? start)
+  (>= (abs (- (current-seconds) start)) flush-timeout-seconds))
+
+(define (flush-entries entry-receiver log-writer)
+  (letrec ([flush (lambda (start)
+                    (when (not (flush-timeout? start)) 
+                      (let ([next-entry (sync/timeout 0 entry-receiver)])
+                        (when (log-entry? next-entry)
+                          (log-writer next-entry)
+                          (flush start)))))])
+    (flush (current-seconds))))
+
 (define (attach-writer log-writer log-level)
   (letrec  ([receiver (entry-receiver log-level)]
             [loop     (lambda ()
                         (let ([log-entry (next-entry receiver)])
-                          (log-writer log-entry)
-                          (when (not (log-entry-close-writer? log-entry))
-                            (loop))))])                              
+                          (if (log-entry-close-writer? log-entry)
+                              (begin
+                                (flush-entries receiver log-writer)
+                                (log-writer log-entry))
+                              (begin
+                                (log-writer log-entry)
+                                (loop)))))])                              
     (add-writer-thread (thread loop))))
 
 (define writer-threads '())
