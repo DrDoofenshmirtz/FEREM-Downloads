@@ -1,7 +1,9 @@
 #lang racket
 
 (provide read-config-file
-         config-value)
+         config-value
+         get-db-config
+         (struct-out db-config))
 
 (require json)
 
@@ -18,3 +20,13 @@
         (if (absent? value)
             default
             (config-value value (rest keys) default)))))
+
+(struct db-config (database user password server port) #:transparent)
+
+(define (get-db-config config)
+  (let ([database (config-value config '(content db-config database))]
+        [user     (config-value config '(content db-config user))]
+        [password (config-value config '(content db-config password))]
+        [server   (config-value config '(content db-config server))]
+        [port     (config-value config '(content db-config port))])
+    (db-config database user password server port)))
