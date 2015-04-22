@@ -5,11 +5,12 @@
   },
   "content": {
     "db-config": {
-      "host": "localhost",
+      "server": "localhost",
       "port": 5432,
-      "dbname": "ferem",
-      "username": "ferem",
-      "password": "ferem"
+      "database": "ferem",
+      "user": "deinc",
+      "password": "dunkeldorf"
     }
   } 
 }
+
