@@ -4,6 +4,9 @@
     "version": "1.0.0"
   },
   "content": {
+    "app-config": {
+      "port": 17500
+    },
     "db-config": {
       "server": "localhost",
       "port": 5432,
