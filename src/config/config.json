@@ -13,6 +13,13 @@
       "database": "ferem",
       "user": "deinc",
       "password": "dunkeldorf"
+    },
+    "mailbox-config": {
+      "smtp-host": "mail.gmx.net", 
+      "smtp-port": 587, 
+      "smtp-user": "smtp-user", 
+      "smtp-password": "smtp-password", 
+      "sender": "ferem@ferem.org"
     }
   } 
 }
