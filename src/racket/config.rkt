@@ -2,10 +2,12 @@
 
 (provide read-config-file
          config-value
+         config-accessor
          get-db-config
          get-app-config
          (struct-out db-config)
-         (struct-out app-config))
+         (struct-out app-config)
+         (struct-out mailbox-config))
 
 (require json)
 
@@ -23,18 +25,37 @@
             default
             (config-value value (rest keys) default)))))
 
+(define (config-accessor config keys)
+  (lambda (key [default #f])
+    (config-value config (append keys (list key)) default)))
+
 (struct db-config (database user password server port) #:transparent)
 
 (define (get-db-config config)
-  (let ([database (config-value config '(content db-config database))]
-        [user     (config-value config '(content db-config user))]
-        [password (config-value config '(content db-config password))]
-        [server   (config-value config '(content db-config server))]
-        [port     (config-value config '(content db-config port))])
+  (let* ([value    (config-accessor config '(content db-config))]
+         [database (value 'database)]
+         [user     (value 'user)]
+         [password (value 'password)]
+         [server   (value 'server)]
+         [port     (value 'port)])
     (db-config database user password server port)))
 
 (struct app-config (port) #:transparent)
 
 (define (get-app-config config)
-  (let ([port (config-value config '(content app-config port))])
+  (let* ([value (config-accessor config '(content app-config))]         
+         [port  (value 'port)])
     (app-config port)))
+
+(struct mailbox-config 
+  (smtp-host smtp-port smtp-user smtp-password sender)
+  #:transparent)
+
+(define (get-mailbox-config config)
+  (let* ([value         (config-accessor config '(content mailbox-config))]
+         [smtp-host     (value 'smtp-host)]
+         [smtp-port     (value 'smtp-port)]
+         [smtp-user     (value 'smtp-user)]
+         [smtp-password (value 'smtp-password)]
+         [sender        (value 'sender)])
+    (mailbox-config smtp-host smtp-port smtp-user smtp-password sender)))
