@@ -5,6 +5,7 @@
          config-accessor
          get-db-config
          get-app-config
+         get-mailbox-config
          (struct-out db-config)
          (struct-out app-config)
          (struct-out mailbox-config))
