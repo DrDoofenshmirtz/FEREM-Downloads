@@ -6,6 +6,7 @@
          "logging.rkt"
          "config.rkt"
          "dbutils.rkt"
+         "mailbox.rkt"
          "actions.rkt")
 
 (define (config-path working-directory)
@@ -26,13 +27,27 @@
          [password  (db-config-password db-config)])
     (connect-to database user password #:server server #:port port)))
 
-(struct app (port db-conn) #:transparent)
+(define (create-mailbox config)
+  (log-frmdls-info "...creating mailbox...")
+  (let* ([mbx-config    (get-mailbox-config config)]
+         [smtp-host     (mailbox-config-smtp-host mbx-config)]
+         [smtp-port     (mailbox-config-smtp-port mbx-config)]
+         [smtp-user     (mailbox-config-smtp-user mbx-config)]
+         [smtp-password (mailbox-config-smtp-password mbx-config)]
+         [sender        (mailbox-config-sender mbx-config)])
+    (mbx-create #:smtp-host     smtp-host                    
+                #:smtp-port     smtp-port
+                #:smtp-user     smtp-user
+                #:smtp-password smtp-password
+                #:sender        sender)))
 
-(define (set-up config db-conn)
+(struct app (port db-conn mailbox) #:transparent)
+
+(define (set-up config db-conn mailbox)
   (log-frmdls-info "...setting up the application...")
   (let* ([app-config (get-app-config config)]
          [port       (app-config-port app-config)])
-    (app port db-conn)))
+    (app port db-conn mailbox)))
 
 (define (boot-failed error)
   (log-frmdls-error "Failed to boot the application (error: ~a)!"
@@ -44,7 +59,8 @@
   (with-handlers ([exn:fail? boot-failed])
     (let* ([config  (load-config working-directory)]
            [db-conn (connect-to-db config)]
-           [app     (set-up config db-conn)])
+           [mailbox (create-mailbox config)]
+           [app     (set-up config db-conn mailbox)])
       (log-frmdls-info "~a" app)  
       app)))
 
