@@ -15,7 +15,9 @@
 (define (load-config working-directory)
   (let ([config-path (config-path working-directory)])
     (log-frmdls-info "...loading config (file: ~a)..." config-path)
-    (read-config-file config-path)))
+    (let ([config (read-config-file config-path)])
+      (log-frmdls-info "\n\n~a\n" (config->string config))
+      config)))
 
 (define (connect-to-db config)
   (log-frmdls-info "...connecting to the database...")
@@ -60,8 +62,7 @@
     (let* ([config  (load-config working-directory)]
            [db-conn (connect-to-db config)]
            [mailbox (create-mailbox config)]
-           [app     (set-up config db-conn mailbox)])
-      (log-frmdls-info "~a" app)  
+           [app     (set-up config db-conn mailbox)])  
       app)))
 
 (define (close-log-writers-on-exit exit-code)
